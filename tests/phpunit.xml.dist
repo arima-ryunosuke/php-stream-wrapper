@@ -1,0 +1,39 @@
+<phpunit
+        bootstrap="bootstrap.php"
+        colors="true"
+        columns="100"
+        beStrictAboutTestsThatDoNotTestAnything="false"
+        printerClass="\ryunosuke\PHPUnit\Printer\ProgressPrinter"
+>
+    <testsuites>
+        <testsuite name="tests">
+            <directory>./Test/</directory>
+        </testsuite>
+    </testsuites>
+
+    <php>
+        <const name="REDIS_DSN" value="127.0.0.1:6379"/>
+        <const name="REDIS_DB" value="1"/>
+
+        <const name="MYSQL_DSN" value="root:Password1234@127.0.0.1:3306?charset=utf8mb4"/>
+        <const name="MYSQL_DB" value="testdb"/>
+        <const name="MYSQL_TABLE1" value="kvs"/>
+        <const name="MYSQL_TABLE2" value="kvs2"/>
+
+        <const name="S3_DSN" value="minio:minio123@127.0.0.1:9000?region=ap-northeast-1&amp;version=latest&amp;use_path_style_endpoint=true"/>
+        <const name="S3_BUCKET" value="test-bucket"/>
+
+        <const name="SMTP_DSN" value="user:pass@127.0.0.1:1025"/>
+        <const name="MAILHOG_URL" value="http://127.0.0.1:8025"/>
+    </php>
+
+    <coverage>
+        <include>
+            <directory suffix=".php">../src</directory>
+        </include>
+        <exclude>
+            <file>../src/StreamWrapperAdapterTrait.php</file>
+            <file>../src/StreamWrapperNoopTrait.php</file>
+        </exclude>
+    </coverage>
+</phpunit>
