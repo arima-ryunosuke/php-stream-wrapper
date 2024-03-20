@@ -139,19 +139,25 @@ class MysqlStream extends AbstractStream
 
         [$driver, $tablename, $id] = static::resolve($resource->url);
 
-        if ($resource->locked) {
+        if ($resource->locked !== LOCK_UN) {
             if (!$driver->inTransaction()) {
                 $driver->beginTransaction();
             }
 
             $lock = '';
-            if ($resource->locked === LOCK_SH) {
+            if ($resource->locked & LOCK_SH) {
                 $lock = 'LOCK IN SHARE MODE';
             }
-            if ($resource->locked === LOCK_EX) {
+            if ($resource->locked & LOCK_EX) {
                 $lock = 'FOR UPDATE';
             }
-            $driver->execute("SELECT id FROM $tablename WHERE id = ? $lock", [$id], false);
+            if ($resource->locked & LOCK_NB) {
+                $lock .= ' SKIP LOCKED';
+            }
+            $stmt = $driver->execute("SELECT id FROM $tablename WHERE id = ? $lock", [$id], false);
+            if ($resource->locked & LOCK_NB) {
+                return !!$stmt->rowCount();
+            }
         }
         else {
             if ($driver->inTransaction()) {

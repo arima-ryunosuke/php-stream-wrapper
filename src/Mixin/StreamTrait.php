@@ -304,19 +304,7 @@ trait StreamTrait
     public function _flock(object/*Resource*/ $resource, int $operation): bool
     {
         /** @var Resource $resource */
-        if ($operation & LOCK_NB) {
-            NotImplementException::throw("this stream is not supported LOCK_NB");
-        }
-
-        if ($operation === LOCK_UN) {
-            $resource->locked = 0;
-        }
-        elseif ($operation & LOCK_SH) {
-            $resource->locked = LOCK_SH;
-        }
-        elseif ($operation & LOCK_EX) {
-            $resource->locked = LOCK_EX;
-        }
+        $resource->locked = $operation;
         return true;
     }
 

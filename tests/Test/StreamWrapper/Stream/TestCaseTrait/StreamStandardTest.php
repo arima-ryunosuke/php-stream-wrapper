@@ -2,7 +2,6 @@
 
 namespace ryunosuke\Test\StreamWrapper\Stream\TestCaseTrait;
 
-use ryunosuke\StreamWrapper\Exception\NotImplementException;
 use ryunosuke\Test\StreamWrapper\Stream\FileStreamTest;
 
 trait StreamStandardTest
@@ -211,10 +210,8 @@ trait StreamStandardTest
             return;
         }
 
-        $this->expectException(NotImplementException::class);
-
         $fp = fopen(static::$scheme0 . "://" . static::$namespace . "/this/is/locking", 'c+');
-        flock($fp, LOCK_NB | LOCK_EX);
+        that(flock($fp, LOCK_NB | LOCK_EX))->isTrue();
     }
 
     function test_stream_fstat()
