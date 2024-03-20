@@ -363,7 +363,7 @@ php のメーリングリスト（URL 失念）を辿った結果、深遠な理
 - StreamWrapper: [`stream_lock(int $operation): bool`](https://www.php.net/manual/streamwrapper.stream-lock.php)
 - ThisPackage: `_flock(object $resource, int $operation): bool`
 
-「`LOCK_NB` なのにブロックが発生した」場合のレシーバ引数 `$would_block` は対応していません。
+「ロックがブロックされた」場合のレシーバ引数 `$would_block` は対応していません。
 ストリーム側に対応する引数が存在しないため、呼び元に値を伝える術がないためです。
 
 ###### `_fstat`
@@ -625,6 +625,10 @@ MIT
 - メジャー: 大規模な互換性破壊の際にアップします（アーキテクチャ、クラス構造の変更など）
 - マイナー: 小規模な互換性破壊の際にアップします（引数の変更、タイプヒントの追加など）
 - パッチ: 互換性破壊はありません（デフォルト引数の追加や、新たなクラスの追加、コードフォーマットなど）
+
+### 1.1.0
+
+- [*change] flock のシンプル化
 
 ### 1.0.0
 
