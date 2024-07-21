@@ -184,6 +184,8 @@ class UrlTest extends AbstractStreamTestCase
         that(Url::class)->new('scheme://_')->wasThrown('malformed URL');
         that(Url::class)->new('scheme://a:')->wasThrown('malformed URL');
         that(Url::class)->new('scheme://a/%a')->wasThrown('malformed URL');
+
+        that(Url::class)->new('local://path/to/file', true)->url->is('local://path/to/file');
     }
 
     function test_getset()
@@ -191,6 +193,7 @@ class UrlTest extends AbstractStreamTestCase
         $url = new Url('scheme://user:pass@host:80/path/to/file.ext?a=1#fragment');
 
         // actual
+        that($url->scheme)->isSame('scheme');
         that($url)->__get('scheme')->isSame('scheme');
         that($url)->__get('user')->isSame('user');
         that($url)->__get('pass')->isSame('pass');

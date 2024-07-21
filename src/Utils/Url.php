@@ -27,6 +27,8 @@ use LogicException;
  */
 class Url
 {
+    private bool $localProtocol;
+
     private ?string $scheme;
     private ?string $user;
     private ?string $pass;
@@ -38,8 +40,14 @@ class Url
     private ?array  $query;
     private ?string $fragment;
 
-    public function __construct(string $url)
+    public function __construct(string $url, bool $localProtocol = false)
     {
+        $this->localProtocol = $localProtocol;
+
+        if ($this->localProtocol) {
+            $url = preg_replace('#^[a-z][-+.0-9a-z]*://#', '$0localhost/', $url);
+        }
+
         $url = strtr($url, ['\\' => '/']);
         $url = preg_replace('#^//#', '', $url);
 
@@ -92,8 +100,8 @@ class Url
             case 'url':
                 return implode('', [
                     $this->scheme === null ? '' : "{$this->scheme}://",
-                    $this->authority,
-                    $this->path,
+                    $this->localProtocol ? '' : $this->authority,
+                    $this->localProtocol ? ltrim($this->path, '/') : $this->path,
                     $this->querystring,
                     $this->fragment === null ? '' : "#{$E(rawurlencode($this->fragment))}",
                 ]);
