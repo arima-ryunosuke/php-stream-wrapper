@@ -188,7 +188,7 @@ class UrlTest extends AbstractStreamTestCase
 
     function test_getset()
     {
-        $url = new Url('scheme://user:pass@host:80/path?a=1#fragment');
+        $url = new Url('scheme://user:pass@host:80/path/to/file.ext?a=1#fragment');
 
         // actual
         that($url)->__get('scheme')->isSame('scheme');
@@ -196,24 +196,31 @@ class UrlTest extends AbstractStreamTestCase
         that($url)->__get('pass')->isSame('pass');
         that($url)->__get('host')->isSame('host');
         that($url)->__get('port')->isSame(80);
-        that($url)->__get('path')->isSame('/path');
+        that($url)->__get('dirname')->isSame('/path/to');
+        that($url)->__get('filename')->isSame('file');
+        that($url)->__get('extension')->isSame('ext');
         that($url)->__get('query')->isSame(['a' => '1']);
         that($url)->__get('fragment')->isSame('fragment');
 
         // virtual
-        that($url)->__get('url')->isSame('scheme://user:pass@host:80/path?a=1#fragment');
+        that($url)->__get('url')->isSame('scheme://user:pass@host:80/path/to/file.ext?a=1#fragment');
         that($url)->__get('userpass')->isSame('user:pass');
         that($url)->__get('hostport')->isSame('host:80');
         that($url)->__get('authority')->isSame('user:pass@host:80');
         that($url)->__get('dsn')->isSame('user:pass@host:80?a=1');
+        that($url)->__get('path')->isSame('/path/to/file.ext');
+        that($url)->__get('basename')->isSame('file.ext');
 
         // set
         $url->__set('pass', '');
         $url->__set('port', null);
         $url->__set('query', ['a' => 2]);
+        $url->__set('dirname', '/path/2/');
+        $url->__set('filename', 'exfile');
+        $url->__set('extension', '');
 
         // reflect
-        that($url)->__get('url')->isSame('scheme://user:@host/path?a=2#fragment');
+        that($url)->__get('url')->isSame('scheme://user:@host/path/2/exfile?a=2#fragment');
         that($url)->__get('userpass')->isSame('user:');
         that($url)->__get('hostport')->isSame('host');
         that($url)->__get('authority')->isSame('user:@host');
@@ -229,67 +236,77 @@ class UrlTest extends AbstractStreamTestCase
         $url2 = new Url('scheme://user2:pass2@host2:82/path2?a=2&b=2#fragment2');
 
         that($url1->merge($url0))->array()->is([
-            "scheme"   => "scheme",
-            "user"     => "user1",
-            "pass"     => "pass1",
-            "host"     => "host1",
-            "port"     => 81,
-            "path"     => "/path1",
-            "query"    => [
+            "scheme"    => "scheme",
+            "user"      => "user1",
+            "pass"      => "pass1",
+            "host"      => "host1",
+            "port"      => 81,
+            "dirname"   => "/",
+            "filename"  => "path1",
+            "extension" => "",
+            "query"     => [
                 "a" => "1",
             ],
-            "fragment" => "fragment1",
+            "fragment"  => "fragment1",
         ]);
         that($url0->merge($url1))->array()->is([
-            "scheme"   => "scheme",
-            "user"     => "user1",
-            "pass"     => "pass1",
-            "host"     => "host1",
-            "port"     => 81,
-            "path"     => "/path1",
-            "query"    => [
+            "scheme"    => "scheme",
+            "user"      => "user1",
+            "pass"      => "pass1",
+            "host"      => "host1",
+            "port"      => 81,
+            "dirname"   => "/",
+            "filename"  => "path1",
+            "extension" => "",
+            "query"     => [
                 "a" => "1",
             ],
-            "fragment" => "fragment1",
+            "fragment"  => "fragment1",
         ]);
         that($url0->merge($url2))->array()->is([
-            "scheme"   => "scheme",
-            "user"     => "user2",
-            "pass"     => "pass2",
-            "host"     => "host2",
-            "port"     => 82,
-            "path"     => "/path2",
-            "query"    => [
+            "scheme"    => "scheme",
+            "user"      => "user2",
+            "pass"      => "pass2",
+            "host"      => "host2",
+            "port"      => 82,
+            "dirname"   => "/",
+            "filename"  => "path2",
+            "extension" => "",
+            "query"     => [
                 "a" => "2",
                 "b" => "2",
             ],
-            "fragment" => "fragment2",
+            "fragment"  => "fragment2",
         ]);
         that($url1->merge($url2))->array()->is([
-            "scheme"   => "scheme",
-            "user"     => "user1",
-            "pass"     => "pass1",
-            "host"     => "host1",
-            "port"     => 81,
-            "path"     => "/path1",
-            "query"    => [
+            "scheme"    => "scheme",
+            "user"      => "user1",
+            "pass"      => "pass1",
+            "host"      => "host1",
+            "port"      => 81,
+            "dirname"   => "/",
+            "filename"  => "path1",
+            "extension" => "",
+            "query"     => [
                 "a" => "2",
                 "b" => "2",
             ],
-            "fragment" => "fragment1",
+            "fragment"  => "fragment1",
         ]);
         that($url2->merge($url1))->array()->is([
-            "scheme"   => "scheme",
-            "user"     => "user2",
-            "pass"     => "pass2",
-            "host"     => "host2",
-            "port"     => 82,
-            "path"     => "/path2",
-            "query"    => [
+            "scheme"    => "scheme",
+            "user"      => "user2",
+            "pass"      => "pass2",
+            "host"      => "host2",
+            "port"      => 82,
+            "dirname"   => "/",
+            "filename"  => "path2",
+            "extension" => "",
+            "query"     => [
                 "a" => "1",
                 "b" => "2",
             ],
-            "fragment" => "fragment2",
+            "fragment"  => "fragment2",
         ]);
     }
 

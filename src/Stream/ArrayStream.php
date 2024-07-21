@@ -41,8 +41,10 @@ class ArrayStream extends AbstractStream
         if ($dirname === '.' || $dirname === '/' || $dirname === '\\') {
             return null;
         }
-        $url       = new Url($url);
-        $url->path = "/$dirname";
+        $url            = new Url($url);
+        $url->dirname   = "/$dirname";
+        $url->filename  = '';
+        $url->extension = '';
         return $url;
     }
 

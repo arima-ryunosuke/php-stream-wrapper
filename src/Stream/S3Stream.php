@@ -66,8 +66,10 @@ class S3Stream extends AbstractStream
         if ($dirname === '.' || $dirname === '/' || $dirname === '\\') {
             return null;
         }
-        $url       = new Url($url);
-        $url->path = ($defaultBucket ? "" : "/$bucket") . "/$dirname";
+        $url            = new Url($url);
+        $url->dirname   = ($defaultBucket ? "" : "/$bucket") . "/$dirname";
+        $url->filename  = '';
+        $url->extension = '';
         return $url;
     }
 

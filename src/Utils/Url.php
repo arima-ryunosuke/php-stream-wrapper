@@ -10,7 +10,9 @@ use LogicException;
  * @property ?string $pass
  * @property ?string $host
  * @property ?int $port
- * @property ?string $path
+ * @property ?string $dirname
+ * @property ?string $filename
+ * @property ?string $extension
  * @property ?array $query
  * @property ?string $fragment
  *
@@ -18,6 +20,8 @@ use LogicException;
  * @property-read string $userpass user+pass
  * @property-read string $hostport host+port
  * @property-read string $authority user+pass+host+port
+ * @property-read ?string $path dirname+filename+extension
+ * @property-read string $basename filename+extension
  * @property-read string $querystring http_build_query(query)
  * @property-read string $dsn user+pass+host+port+querystring
  */
@@ -28,7 +32,9 @@ class Url
     private ?string $pass;
     private ?string $host;
     private ?int    $port;
-    private ?string $path;
+    private ?string $dirname;
+    private ?string $filename;
+    private ?string $extension;
     private ?array  $query;
     private ?string $fragment;
 
@@ -54,12 +60,26 @@ class Url
             throw new InvalidArgumentException("'$url' is malformed URL");
         }
 
-        $this->scheme   = $matches['scheme'];
-        $this->user     = $matches['user'] === null ? null : rawurldecode($matches['user']);
-        $this->pass     = $matches['pass'] === null ? null : rawurldecode($matches['pass']);
-        $this->host     = $matches['host'] === null ? null : preg_replace('#^\\[(.+)]$#', '$1', $matches['host']);
-        $this->port     = $matches['port'] === null ? null : (int) $matches['port'];
-        $this->path     = $matches['path'] === null ? null : rawurldecode('/' . ltrim($matches['path'], '/'));
+        $this->scheme = $matches['scheme'];
+
+        $this->user = $matches['user'] === null ? null : rawurldecode($matches['user']);
+        $this->pass = $matches['pass'] === null ? null : rawurldecode($matches['pass']);
+
+        $this->host = $matches['host'] === null ? null : preg_replace('#^\\[(.+)]$#', '$1', $matches['host']);
+        $this->port = $matches['port'] === null ? null : (int) $matches['port'];
+
+        if ($matches['path'] === null) {
+            $this->dirname   = null;
+            $this->filename  = null;
+            $this->extension = null;
+        }
+        else {
+            $pathinfo        = pathinfo(rawurldecode('/' . ltrim($matches['path'], '/')));
+            $this->dirname   = $pathinfo['dirname'] === '.' ? '' : '/' . ltrim(strtr($pathinfo['dirname'], '\\', '/'), '/');
+            $this->filename  = $pathinfo['filename'];
+            $this->extension = $pathinfo['extension'] ?? '';
+        }
+
         $this->query    = $matches['query'] === null ? null : $this->parseQuery($matches['query']);
         $this->fragment = $matches['fragment'] === null ? null : rawurldecode($matches['fragment']);
     }
@@ -98,6 +118,16 @@ class Url
                     $this->authority,
                     $this->querystring,
                 ]);
+            case 'path':
+                return $this->dirname === null ? null : '/' . ltrim(implode('', [
+                        strlen($this->dirname) ? rtrim($this->dirname, '/') : "",
+                        strlen($this->basename) ? "/{$this->basename}" : "",
+                    ]), '/');
+            case 'basename':
+                return implode('', [
+                    $this->filename,
+                    strlen($this->extension) ? ".$this->extension" : "",
+                ]);
             case 'querystring':
                 return $this->query === null ? '' : "?{$E(http_build_query($this->query))}";
             default:
@@ -120,14 +150,16 @@ class Url
     public function array(): array
     {
         return [
-            'scheme'   => $this->scheme,
-            'user'     => $this->user,
-            'pass'     => $this->pass,
-            'host'     => $this->host,
-            'port'     => $this->port,
-            'path'     => $this->path,
-            'query'    => $this->query,
-            'fragment' => $this->fragment,
+            'scheme'    => $this->scheme,
+            'user'      => $this->user,
+            'pass'      => $this->pass,
+            'host'      => $this->host,
+            'port'      => $this->port,
+            'dirname'   => $this->dirname,
+            'filename'  => $this->filename,
+            'extension' => $this->extension,
+            'query'     => $this->query,
+            'fragment'  => $this->fragment,
         ];
     }
 
@@ -137,13 +169,15 @@ class Url
             throw new LogicException("mismatch scheme");
         }
 
-        $result           = clone $this;
-        $result->user     ??= $that->user;
-        $result->pass     ??= $that->pass;
-        $result->host     ??= $that->host;
-        $result->port     ??= $that->port;
-        $result->path     ??= $that->path;
-        $result->fragment ??= $that->fragment;
+        $result            = clone $this;
+        $result->user      ??= $that->user;
+        $result->pass      ??= $that->pass;
+        $result->host      ??= $that->host;
+        $result->port      ??= $that->port;
+        $result->dirname   ??= $that->dirname;
+        $result->filename  ??= $that->filename;
+        $result->extension ??= $that->extension;
+        $result->fragment  ??= $that->fragment;
 
         if (isset($that->query)) {
             $result->query = array_replace_recursive($this->query ?? [], $that->query);
