@@ -8,6 +8,25 @@ use Throwable;
 
 class ErrorException extends RuntimeException
 {
+    public static function handle(Closure $callback)
+    {
+        set_error_handler(function ($severity, $message) {
+            $map = [
+                E_ERROR      => E_USER_ERROR,
+                E_WARNING    => E_USER_WARNING,
+                E_NOTICE     => E_USER_NOTICE,
+                E_DEPRECATED => E_USER_DEPRECATED,
+            ];
+            throw new static($message, $map[$severity] ?? $severity);
+        });
+        try {
+            return $callback();
+        }
+        finally {
+            restore_error_handler();
+        }
+    }
+
     public static function convert(Closure $callback, string $catch = Exception::class, int $code = E_USER_WARNING)
     {
         try {

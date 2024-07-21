@@ -253,4 +253,11 @@ trait StreamStandardTest
         file_put_contents("php://filter/write=string.toupper/resource=$url", 'aaa');
         that(file_get_contents($url))->is('AAA');
     }
+
+    function test_stream_select()
+    {
+        $url = static::$scheme0 . "://" . static::$namespace . "/this/is/select";
+        file_put_contents($url, 'aaa');
+        that(mime_content_type($url))->is('text/plain');
+    }
 }

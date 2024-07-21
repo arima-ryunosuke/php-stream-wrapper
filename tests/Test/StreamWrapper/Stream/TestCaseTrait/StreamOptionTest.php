@@ -9,7 +9,7 @@ trait StreamOptionTest
         $url = static::$scheme0 . "://" . static::$namespace . "/option";
 
         $fp = fopen($url, 'w+');
-        that(stream_set_blocking($fp, true))->is(static::$scheme0 !== 'file' || DIRECTORY_SEPARATOR === '/');
+        that(stream_set_blocking($fp, true))->is(!str_contains(static::$scheme0, 'file') || DIRECTORY_SEPARATOR === '/');
     }
 
     function test_stream_set_read_buffer()
@@ -25,7 +25,7 @@ trait StreamOptionTest
         $url = static::$scheme0 . "://" . static::$namespace . "/option";
 
         $fp = fopen($url, 'w+');
-        that(stream_set_write_buffer($fp, 456))->is(static::$scheme0 === 'file' ? -1 : 0);
+        that(stream_set_write_buffer($fp, 456))->is(str_contains(static::$scheme0, 'file') ? -1 : 0);
     }
 
     function test_stream_set_timeout()
@@ -33,6 +33,6 @@ trait StreamOptionTest
         $url = static::$scheme0 . "://" . static::$namespace . "/option";
 
         $fp = fopen($url, 'w+');
-        that(stream_set_timeout($fp, 789))->is(static::$scheme0 !== 'file');
+        that(stream_set_timeout($fp, 789))->is(!str_contains(static::$scheme0, 'file'));
     }
 }

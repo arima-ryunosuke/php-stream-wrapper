@@ -10,6 +10,19 @@ use ryunosuke\Test\StreamWrapper\Stream\AbstractStreamTestCase;
 
 class ErrorExceptionTest extends AbstractStreamTestCase
 {
+    function test_handle()
+    {
+        try {
+            ErrorException::handle(function () {
+                return [][''];
+            });
+        }
+        catch (Exception $e) {
+            that(get_class($e))->is(ErrorException::class);
+            that($e->getMessage())->contains('Undefined');
+        }
+    }
+
     function test_convert()
     {
         try {
