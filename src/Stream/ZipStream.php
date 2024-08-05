@@ -71,7 +71,7 @@ class ZipStream extends AbstractStream
         else {
             $url->dirname   = "/$zipfilename/$dirname/";
             $url->filename  = '';
-            $url->extension = '';
+            $url->extension = null;
         }
         return $url;
     }

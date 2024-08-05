@@ -85,7 +85,7 @@ class Url
             $pathinfo        = pathinfo(rawurldecode('/' . ltrim($matches['path'], '/')));
             $this->dirname   = $pathinfo['dirname'] === '.' ? '' : '/' . ltrim(strtr($pathinfo['dirname'], '\\', '/'), '/');
             $this->filename  = $pathinfo['filename'];
-            $this->extension = $pathinfo['extension'] ?? '';
+            $this->extension = $pathinfo['extension'] ?? null;
         }
 
         $this->query    = $matches['query'] === null ? null : $this->parseQuery($matches['query']);
@@ -134,7 +134,7 @@ class Url
             case 'basename':
                 return implode('', [
                     $this->filename,
-                    strlen($this->extension) ? ".$this->extension" : "",
+                    $this->extension === null ? "" : ".$this->extension",
                 ]);
             case 'querystring':
                 return $this->query === null ? '' : "?{$E(http_build_query($this->query))}";

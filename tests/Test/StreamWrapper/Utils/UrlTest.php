@@ -220,7 +220,7 @@ class UrlTest extends AbstractStreamTestCase
         $url->__set('query', ['a' => 2]);
         $url->__set('dirname', '/path/2/');
         $url->__set('filename', 'exfile');
-        $url->__set('extension', '');
+        $url->__set('extension', null);
 
         // reflect
         that($url)->__get('url')->isSame('scheme://user:@host/path/2/exfile?a=2#fragment');

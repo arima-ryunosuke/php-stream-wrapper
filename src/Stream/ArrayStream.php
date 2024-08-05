@@ -10,6 +10,7 @@ use ryunosuke\StreamWrapper\Mixin\UrlIOTrait;
 use ryunosuke\StreamWrapper\Mixin\UrlPermissionTrait;
 use ryunosuke\StreamWrapper\Utils\Stat;
 use ryunosuke\StreamWrapper\Utils\Url;
+use Traversable;
 
 class ArrayStream extends AbstractStream
 {
@@ -44,7 +45,7 @@ class ArrayStream extends AbstractStream
         $url            = new Url($url);
         $url->dirname   = "/$dirname";
         $url->filename  = '';
-        $url->extension = '';
+        $url->extension = null;
         return $url;
     }
 
@@ -213,7 +214,7 @@ class ArrayDriver implements IteratorAggregate
         return $child;
     }
 
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         yield from $this->children;
     }
