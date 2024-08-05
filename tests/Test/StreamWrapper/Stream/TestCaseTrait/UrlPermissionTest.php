@@ -8,6 +8,14 @@ trait UrlPermissionTest
 {
     function test_coverage_for_windows()
     {
+        if (version_compare(PHP_VERSION, '8.0') >= 0) {
+            // php's bug...?
+            // The documentation says "On Windows, this function fails silently when applied on a regular file.", but in fact a ValueError is throwed.
+            // https://github.com/php/php-src/blob/31f256492e94e659d08d523e11e8db0939555519/main/streams/plain_wrapper.c#L1529-L1554
+            // https://github.com/php/php-src/blob/31f256492e94e659d08d523e11e8db0939555519/ext/standard/filestat.c#L478-L484
+            self::markTestSkipped('this test unset 8.0 only');
+        }
+
         if (!($this instanceof FileStreamTest)) {
             return;
         }
